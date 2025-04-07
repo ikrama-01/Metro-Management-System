@@ -1,0 +1,12 @@
+# Ignore for backend
+/backend/src/main/resources/application-local.properties
+/backend/target/
+
+# Ignore for frontend
+/frontend/node_modules/
+frontend/.env
+
+# General ignores
+.DS_Store
+*.log
+*.class
