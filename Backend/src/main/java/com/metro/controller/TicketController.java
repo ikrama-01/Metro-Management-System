@@ -17,7 +17,7 @@ import com.metro.service.TicketService;
 
 @RestController
 @RequestMapping("/api/tickets") 
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:5173")
 public class TicketController {
 	
 	@Autowired

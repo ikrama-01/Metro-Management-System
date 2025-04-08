@@ -1,6 +1,7 @@
 package com.metro.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -21,7 +22,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class UserController
 {
 
@@ -33,9 +34,12 @@ public class UserController
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
-	
 	@PostMapping("/register")
 	public ResponseEntity<UserResponseDTO> registerUser(@RequestBody User user){
+		if (user.getPassword() == null || user.getPassword().isBlank()) {
+		    throw new IllegalArgumentException("Password cannot be null or blank");
+		}
+
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
 		User savedUser = userService.registerUser(user);
 		
@@ -58,12 +62,27 @@ public class UserController
 		}
 
 		String token = jwtService.generateToken(user.getEmail(), user.getRole().name());
-		return ResponseEntity.ok(new LoginResponse(token));
+		return ResponseEntity.ok(new LoginResponse(token, user.getRole().name()));
 	}
 	
 	@GetMapping("/profile")
-	public ResponseEntity<String> getProfile(HttpServletRequest request){
-		String email = (String) request.getAttribute("email");
-		return ResponseEntity.ok("Welcome, " + email+ "! You accessed a protected endpoint" );
+	public ResponseEntity<UserResponseDTO> getProfile(HttpServletRequest request) {
+	    String email = (String) request.getAttribute("email");
+	    User user = userService.getUserByEmail(email);
+	    if (user == null) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+	    }
+
+	    UserResponseDTO responseDTO = new UserResponseDTO(
+	        user.getId(),
+	        user.getName(),
+	        user.getEmail(),
+	        user.getWalletBalance(),
+	        user.getRole()
+	    );
+	    return ResponseEntity.ok(responseDTO);
 	}
+
+
+
 }

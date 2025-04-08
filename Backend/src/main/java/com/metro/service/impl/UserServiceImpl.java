@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.metro.model.Role;
 import com.metro.model.User;
 import com.metro.repository.UserRepository;
 import com.metro.service.UserService;
@@ -19,6 +20,8 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public User registerUser(User user) {
 		user.setId( UUID.randomUUID().toString());
+		user.setRole(Role.USER);
+		user.setWalletBalance(0.0);
 		return userRepository.save(user);
 	}
 	

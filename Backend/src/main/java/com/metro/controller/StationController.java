@@ -19,7 +19,7 @@ import com.metro.service.StationService;
 
 @RestController
 @RequestMapping("/api/stations")
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:5173")
 public class StationController 
 {
 	@Autowired

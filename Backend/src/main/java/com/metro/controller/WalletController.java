@@ -17,8 +17,8 @@ import com.metro.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
-@RequestMapping("api/wallet")
-@CrossOrigin
+@RequestMapping("/api/wallet")
+@CrossOrigin(origins = "http://localhost:5173")
 public class WalletController 
 {
 	@Autowired

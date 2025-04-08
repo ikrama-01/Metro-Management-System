@@ -22,7 +22,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter
@@ -36,6 +35,11 @@ public class JwtFilter extends OncePerRequestFilter
 			HttpServletResponse response,
 			FilterChain filterChain) throws ServletException, IOException, java.io.IOException{
 		
+	    if (request.getMethod().equalsIgnoreCase("OPTIONS")) {
+	        response.setStatus(HttpServletResponse.SC_OK);
+	        return;
+	    }
+	    
 	    // ⛔ Skip filter for register/login endpoints
 	    String path = request.getRequestURI();
 	    if (path.contains("/register") || path.contains("/login")) {
@@ -57,6 +61,7 @@ public class JwtFilter extends OncePerRequestFilter
 				request.setAttribute("email", claims.getSubject());
 				
 				String role = (String) claims.get("role");
+
 				List<GrantedAuthority> authorities = Collections.singletonList(
 					    new SimpleGrantedAuthority("ROLE_" + role)
 					);
@@ -64,7 +69,6 @@ public class JwtFilter extends OncePerRequestFilter
 			    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
 			        claims.getSubject(), null, authorities);
 			    SecurityContextHolder.getContext().setAuthentication(authToken);
-			    System.out.println("AuthToken Set: " + SecurityContextHolder.getContext().getAuthentication());
 
 			} catch (Exception e) {
 				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
